@@ -6,6 +6,10 @@
 import time
 
 
+
+"""
+Private Functions
+"""
 def timed_function(f, *args, **kwargs):
     myname = str(f).split(' ')[1]
     def new_func(*args, **kwargs):
@@ -15,6 +19,43 @@ def timed_function(f, *args, **kwargs):
         print('Function {} Time = {:6.3f}ms'.format(myname, delta/1000))
         return result
     return new_func
+
+
+
+
+
+
+
+#converts bitString to integer
+bitString2int_Cache = {}
+def bitString2int(bitString):
+    #find a way to make this Much faster
+    #try int(bitString, 2)
+    integerOut = 0
+    if not(bitString in bitString2int_Cache):
+        for index in range(len(bitString)):
+            integerOut += (2**(len(bitString)-1-index))*(bitString[index]=="1")
+        #print(bitString, "==", integerOut, "==", "{:08b}".format(integerOut))
+        bitString2int_Cache[ bitString ] = integerOut
+    else:
+        integerOut = bitString2int_Cache[bitString]
+    #print(f"length of bitString2int_Cache:{len(bitString2int_Cache)}")
+    return integerOut
+
+
+
+#ensure RbR is in intList Format
+@timed_function
+def bitStringList2intList(bitStringList):
+    outputList = []
+    for index in bitStringList:
+        if type(index)==type("0"):
+            outputList.append( bitString2int( index ) )
+        elif type(index)==type(0):
+            outputList.append( index )
+    return outputList
+
+
 
 
 
@@ -71,11 +112,12 @@ def getPixelValueFromRbR(imageList, xPos, yPos):
     #stringVerInput = "{:08b}".format(imageList[yPos])
     #pixelValue = int(stringVerInput[xPos])
     #return pixelValue
-    return 1*(imageList[yPos]&(0b10000000>>xPos) == (0b10000000>>xPos))
+    return 1*(imageList[yPos]&(0b00000001<<xPos) == (0b00000001<<xPos))
+
 
 @timed_function
 def convertImageFormat2PixelList(imageRbRList):
-    print(imageRbRList)
+    imageRbRList = bitStringList2intList( imageRbRList )
     imageDict = {
         "SizeX":8,
         "SizeY":8,
@@ -110,6 +152,57 @@ def convertImageFormat2PixelList(imageRbRList):
             imageDict["Pixels"][xPos + yPos*8] = getPixelValueFromRbR(imageRbRList, xPos, yPos)
     #"""
     return imageDict
+
+
+
+
+
+"""
+other Functions
+"""
+
+
+
+@timed_function
+def subtractBitImagefromBitImage(minuend_BitImage, subtrahend_BitImage):
+    #"ms":"d"
+    truthTable = {"00":"0",
+                  "01":"2", #shoud not Happen
+                  "10":"1",
+                  "11":"0",
+                  }
+    difference_BitImage = {
+        "SizeX":8,
+        "SizeY":8,
+        "Palette":[0x00000000,0xffffffff],
+        "Pixels":[
+            0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0
+            ],
+        }
+    if (minuend_BitImage["SizeX"] == subtrahend_BitImage["SizeX"] and difference_BitImage["SizeX"] == minuend_BitImage["SizeX"]):
+        if (minuend_BitImage["SizeY"] == subtrahend_BitImage["SizeY"] and difference_BitImage["SizeY"] == minuend_BitImage["SizeY"]):
+            for pixelIndex in range(len(difference_BitImage["Pixels"])):
+                difference_BitImage["Pixels"][pixelIndex] = minuend_BitImage["Pixels"][pixelIndex] - subtrahend_BitImage["Pixels"][pixelIndex]
+            pass
+    
+    
+    return difference_BitImage
+
+
+
+
+
+
+
+
+
 
 
 

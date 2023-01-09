@@ -83,6 +83,7 @@ from MyModules.matrix_image_prcessing_functions import *
 for index in loading_images.keys():
     _MasterImageDictionary[index] = convertImageFormat2PixelList( loading_images[index] )
 del loading_images
+
 for index in letters8x8_images.keys():
     _MasterImageDictionary[index] = convertImageFormat2PixelList( letters8x8_images[index] )
 del letters8x8_images

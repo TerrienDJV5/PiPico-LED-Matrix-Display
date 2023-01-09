@@ -192,15 +192,29 @@ def better_shift_out_update(inputList,data,clock,latch): #LSBFIRST
 
 
 
-
 #rotateImage 270 degrees 8X8 image
+#@timed_function
 def rotateStrImage270(input_image_array):
-    flipped_image_String_array = [["0","0","0","0","0","0","0","0"],["0","0","0","0","0","0","0","0"],["0","0","0","0","0","0","0","0"],["0","0","0","0","0","0","0","0"],["0","0","0","0","0","0","0","0"],["0","0","0","0","0","0","0","0"],["0","0","0","0","0","0","0","0"],["0","0","0","0","0","0","0","0"]]
+    #"""
+    flipped_image_String_array = ["00000000", "00000000", "00000000", "00000000", "00000000", "00000000", "00000000", "00000000"]
+    tempList = ["0","0","0","0","0","0","0","0"]
+    for i in [0,1,2,3,4,5,6,7]:
+        for j in [0,1,2,3,4,5,6,7]:
+            tempList[j] = input_image_array[j][i]
+        flipped_image_String_array[i] = "".join(tempList)
+    del tempList
+    #"""
+    
+    """
+    flipped_image_String_array = [["0","0","0","0","0","0","0","0"], ["0","0","0","0","0","0","0","0"], ["0","0","0","0","0","0","0","0"], ["0","0","0","0","0","0","0","0"], ["0","0","0","0","0","0","0","0"], ["0","0","0","0","0","0","0","0"], ["0","0","0","0","0","0","0","0"], ["0","0","0","0","0","0","0","0"]]
     for i in [0,1,2,3,4,5,6,7]:
         for j in [0,1,2,3,4,5,6,7]:
             flipped_image_String_array[i][j] = input_image_array[j][i]
         flipped_image_String_array[i] = "".join(flipped_image_String_array[i])
+    #"""
     return flipped_image_String_array
+
+
 
 
 
@@ -435,25 +449,45 @@ def calculateImageRegisterPatternsRbRandCbC(input_image_array):
     return imageCheck_Cache
 
 
-
-
-
+#converts integer to 8bitString
+int28BitString_Cache = {}
+def convertInt28BitString(intInput):
+    if not(intInput in int28BitString_Cache):
+        output8BitString = "{:08b}".format(intInput)
+        int28BitString_Cache[intInput] = output8BitString
+    else:
+        output8BitString = int28BitString_Cache[intInput]
+    return output8BitString
 
 
 
 #converts bitString to integer
+bitString2int_Cache = {}
 def bitString2int(bitString):
     #find a way to make this Much faster
     #try int(bitString, 2)
     integerOut = 0
-    for index in range(len(bitString)):
-        integerOut += (2**(len(bitString)-1-index))*(bitString[index]=="1")
-    #print(bitString, "==", integerOut, "==", "{:08b}".format(integerOut))
+    if not(bitString in bitString2int_Cache):
+        for index in range(len(bitString)):
+            integerOut += (2**(len(bitString)-1-index))*(bitString[index]=="1")
+        #print(bitString, "==", integerOut, "==", "{:08b}".format(integerOut))
+        bitString2int_Cache[ bitString ] = integerOut
+    else:
+        integerOut = bitString2int_Cache[bitString]
+    #print(f"length of bitString2int_Cache:{len(bitString2int_Cache)}")
     return integerOut
 
 
+def bitStringList2intList(bitStringList):
+    outputList = []
+    for index in bitStringList:
+        outputList.append( bitString2int( index ) )
+    return outputList
 
 
+
+
+#@timed_function
 def subtract8X8BitImagefrom8X8BitImage(minuend_StrBitImage, subtrahend_StrBitImage):
     #helpful: #https://stackoverflow.com/questions/1228299/changing-one-character-in-a-string
     #"ms":"d"
@@ -463,14 +497,14 @@ def subtract8X8BitImagefrom8X8BitImage(minuend_StrBitImage, subtrahend_StrBitIma
                   "11":"0",
                   }
     #image format: RowByRow, "1"=High, "0"=Low
-    difference_StrBitImage = ["00000000","00000000","00000000","00000000","00000000","00000000","00000000","00000000"]
+    difference_StrBitImage = [["0","0","0","0","0","0","0","0"],["0","0","0","0","0","0","0","0"],["0","0","0","0","0","0","0","0"],["0","0","0","0","0","0","0","0"],["0","0","0","0","0","0","0","0"],["0","0","0","0","0","0","0","0"],["0","0","0","0","0","0","0","0"],["0","0","0","0","0","0","0","0"]]
     #indexY = Row,  indexX = Column
     for indexY in [0,1,2,3,4,5,6,7]:
-        bitStrList = list(difference_StrBitImage[indexY])
+        bitStrList = ["0","0","0","0","0","0","0","0"]
         for indexX in [0,1,2,3,4,5,6,7]:
             bitStrList[indexX] = truthTable[ ( minuend_StrBitImage[indexY][indexX] + subtrahend_StrBitImage[indexY][indexX] ) ]
         difference_StrBitImage[indexY] = "".join( bitStrList )
-    difference_StrBitImage = [bitString2int( difference_StrBitImage[i] ) for i in [0,1,2,3,4,5,6,7]]
+        difference_StrBitImage[indexY] = bitString2int( difference_StrBitImage[indexY] )
     
     return difference_StrBitImage
 
@@ -518,16 +552,13 @@ def calculateEfficientImageRegisterPatterns( input_image_array, fastCalculation 
         }
     
     blank_8x8ByteImage = [0,0,0,0,0,0,0,0]
-    cycle_input_image_array = mipf.convertImageFormat2RbR(  input_image_array )
+    cycle_input_image_array = mipf.convertImageFormat2RbR( input_image_array )
     
     bestOption = "None"
     cycleCount = 0 # =could be replaced with binaryImageOutStream["DataListLength"]
     if fastCalculation==False:
         #check if complete, if complete Break out of WhileTrue loop
         while ( ( (cycleCount >=1 )or(cycleCount!=0) ) and (cycle_input_image_array == blank_8x8ByteImage) )==False:
-            #create String copy of cycle_input_image_array
-            cycle_input_image_Str_array = ["{:08b}".format(cycle_input_image_array[i]) for i in [0,1,2,3,4,5,6,7]]
-            
             #imageCheck
             """
             imageCheck_Cache = {
@@ -542,10 +573,13 @@ def calculateEfficientImageRegisterPatterns( input_image_array, fastCalculation 
             LargestPixelCount_CbC_Index_Cache = 0
             imageCheck_Cache_CheckList_RbR = imageCheck_Cache["RbR"]["DataImagesPixelCount"]
             imageCheck_Cache_CheckList_CbC = imageCheck_Cache["CbC"]["DataImagesPixelCount"]
-            for newIndex in range(imageCheck_Cache["RbR"]["DataListLength"]):
-                LargestPixelCount_RbR_Index_Cache = ( newIndex if (imageCheck_Cache["RbR"]["DataImagesPixelCount"][newIndex] > imageCheck_Cache["RbR"]["DataImagesPixelCount"][ LargestPixelCount_RbR_Index_Cache ]) else LargestPixelCount_RbR_Index_Cache )
-            for newIndex in range(imageCheck_Cache["CbC"]["DataListLength"]):
-                LargestPixelCount_CbC_Index_Cache = ( newIndex if (imageCheck_Cache["CbC"]["DataImagesPixelCount"][newIndex] > imageCheck_Cache["CbC"]["DataImagesPixelCount"][ LargestPixelCount_CbC_Index_Cache ]) else LargestPixelCount_CbC_Index_Cache )
+            #for newIndex in range(imageCheck_Cache["RbR"]["DataListLength"]):
+            #    LargestPixelCount_RbR_Index_Cache = ( newIndex if (imageCheck_Cache["RbR"]["DataImagesPixelCount"][newIndex] > imageCheck_Cache["RbR"]["DataImagesPixelCount"][ LargestPixelCount_RbR_Index_Cache ]) else LargestPixelCount_RbR_Index_Cache )
+            #for newIndex in range(imageCheck_Cache["CbC"]["DataListLength"]):
+            #    LargestPixelCount_CbC_Index_Cache = ( newIndex if (imageCheck_Cache["CbC"]["DataImagesPixelCount"][newIndex] > imageCheck_Cache["CbC"]["DataImagesPixelCount"][ LargestPixelCount_CbC_Index_Cache ]) else LargestPixelCount_CbC_Index_Cache )
+            
+            LargestPixelCount_RbR_Index_Cache = imageCheck_Cache_CheckList_RbR.index( max(imageCheck_Cache_CheckList_RbR) )
+            LargestPixelCount_CbC_Index_Cache = imageCheck_Cache_CheckList_CbC.index( max(imageCheck_Cache_CheckList_CbC) )
             
             LargestPixelCount_Index_Cache = {
                 "RbR":LargestPixelCount_RbR_Index_Cache,
@@ -564,14 +598,23 @@ def calculateEfficientImageRegisterPatterns( input_image_array, fastCalculation 
             
             #add to < binaryImageOutStream{} >
             binaryImageOutStream["Data"].append( imageCheck_Cache[bestOption]["Data"][ LargestPixelCount_Index_Cache[bestOption] ] )
-            #tempDataStream = imageCheck_Cache[bestOption]["Data"][ LargestPixelCount_Index_Cache[bestOption] ]
-            #binaryImageOutStream["DataImages"].append( calculateResultImage(tempDataStream[0], tempDataStream[1]) )
-            #del tempDataStream
             binaryImageOutStream["DataImagesPixelCount"].append( imageCheck_Cache[bestOption]["DataImagesPixelCount"][ LargestPixelCount_Index_Cache[bestOption] ] )
             binaryImageOutStream["DataListLength"] += 1
             binaryImageOutStream["DataCalculateType"].append( bestOption )
             
+            #create String copy of cycle_input_image_array
+            cycle_input_image_Str_array = ["{:08b}".format(cycle_input_image_array[i]) for i in [0,1,2,3,4,5,6,7]]
+            #cycle_input_image_Str_array = [convertInt28BitString( cycle_input_image_array[i] ) for i in [0,1,2,3,4,5,6,7]]
+            
             #prepare for next cycle
+            """
+            minuend_BitImage = mipf.convertImageFormat2PixelList( bitStringList2intList( cycle_input_image_Str_array ) )
+            subtrahend_BitImage = mipf.convertImageFormat2PixelList(  bitStringList2intList( calculateResultImage( imageCheck_Cache[bestOption]["Data"][ LargestPixelCount_Index_Cache[bestOption] ][0], imageCheck_Cache[bestOption]["Data"][ LargestPixelCount_Index_Cache[bestOption] ][1]) ) )
+            differenceBitStrArray = mipf.subtractBitImagefromBitImage(minuend_BitImage, subtrahend_BitImage)
+            differenceBitStrArray = mipf.convertImageFormat2RbR( differenceBitStrArray )
+            del minuend_BitImage, subtrahend_BitImage
+            #"""
+            
             differenceBitStrArray = subtract8X8BitImagefrom8X8BitImage(cycle_input_image_Str_array, calculateResultImage( imageCheck_Cache[bestOption]["Data"][ LargestPixelCount_Index_Cache[bestOption] ][0], imageCheck_Cache[bestOption]["Data"][ LargestPixelCount_Index_Cache[bestOption] ][1]) )
             cycle_input_image_array = differenceBitStrArray
             
@@ -580,6 +623,7 @@ def calculateEfficientImageRegisterPatterns( input_image_array, fastCalculation 
             del LargestPixelCount_Index_Cache
             del bestOption
             del imageCheck_Cache
+        print(f"CycleCount: {cycleCount}")
     elif fastCalculation==True:
         image_Cache = calculateImageRegisterPatternsRbR( cycle_input_image_array )
         binaryImageOutStream["Data"] = image_Cache["Data"]
@@ -599,6 +643,41 @@ def calculateEfficientImageRegisterPatterns( input_image_array, fastCalculation 
     return binaryImageOutStream
     
     
+
+
+
+
+"""
+Image Effects Functions
+"""
+
+#make this function scroll Words
+def scroll_Images_Right2Left( imageListArray, offset = 0 ):
+    input_image_array = {
+        "SizeX":8,
+        "SizeY":8,
+        "Palette":[0x00000000,0xffffffff],
+        "Pixels":[
+            0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0
+            ],
+        }
+    return calculateEfficientImageRegisterPatterns( input_image_array, fastCalculation = False )
+
+
+
+
+
+
+
+
+
 
 
 
@@ -653,6 +732,7 @@ sLock = _thread.allocate_lock() #baton
 def second_thread_CoreTask():
     print("second_thread_CoreTask")
     while True:
+        sLock.acquire()
         ###print("Entering second Thread")
         
         #print("T2 - Memory: ", micropython.mem_info())
@@ -671,6 +751,7 @@ def second_thread_CoreTask():
             randomImageArray = [0,0,0,0,0,0,0,0]
             for i in range(8):
                 randomImageArray[i] = random.randint(0, 255)
+            randomImageArray = mipf.convertImageFormat2PixelList( randomImageArray )
             shiftFromBinaryImageStream( calculateEfficientImageRegisterPatterns( randomImageArray, fastCalculation = True ) ,dataPIN ,clockPIN,latchPIN)
         elif (display_Image_Name in registerDisplayImageCache.keys()):
             shiftFromBinaryImageStream( registerDisplayImageCache[ display_Image_Name ] ,dataPIN ,clockPIN,latchPIN)
@@ -678,12 +759,6 @@ def second_thread_CoreTask():
         utime.sleep_ms(5)
         ###print("Exiting second Thread")
         sLock.release()
-
-
-
-
-
-
 
 
 
@@ -747,7 +822,7 @@ except OSError:  # open failed
    runPreComple()
 
 
-del _MasterImageDictionary
+#del _MasterImageDictionary
 
 
 
@@ -773,8 +848,10 @@ nameCacheList += registerDisplayImageCache.keys()
 
 #https://docs.micropython.org/en/latest/reference/speed_python.html
 
+
+
 while True:
-    #sLock.acquire()
+    sLock.acquire()
     gc.collect() #clean up Ram
     #print("");print("");print("");print("");print("");print("");
     print("Entering main Thread")
@@ -791,13 +868,18 @@ while True:
     
     if (display_Image_Name in registerDisplayImageCache):
         shiftFromBinaryImageStream( registerDisplayImageCache[ display_Image_Name ] ,dataPIN ,clockPIN,latchPIN)
-        
+    
+    
+    print("Create Random Image")
     randomImageArray = [0,0,0,0,0,0,0,0]
     for i in range(8):
         randomImageArray[i] = random.randint(0, 255)
     randomImageArray = mipf.convertImageFormat2PixelList( randomImageArray )
+    
     shiftFromBinaryImageStream( calculateEfficientImageRegisterPatterns( randomImageArray, fastCalculation = True ) ,dataPIN ,clockPIN,latchPIN)
+    print("Optimize")
     shiftFromBinaryImageStream( calculateEfficientImageRegisterPatterns( randomImageArray, fastCalculation = False ) ,dataPIN ,clockPIN,latchPIN)
+    
     
     
     
@@ -824,8 +906,9 @@ while True:
     print("FreeMemory: ", gc.mem_free())
     print("Exiting main Thread")
     print("")
+    
     utime.sleep_ms(1000)
-    #sLock.release()
+    sLock.release()
 
 sLock.acquire()
 
