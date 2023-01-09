@@ -1,0 +1,52 @@
+https://lastminuteengineers.com/74hc595-shift-register-arduino-tutorial/
+https://stackoverflow.com/questions/1228299/changing-one-character-in-a-string
+
+#helpFul
+#https://softwareengineering.stackexchange.com/questions/308972/python-file-naming-convention#:~:text=modules%20(filenames)%20should%20have%20short,should%20use%20the%20CapWords%20convention.
+
+
+https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf
+
+
+
+""" Helpful URLs
+https://www.raspberrypi.com/products/raspberry-pi-pico/
+https://csatlas.com/python-import-file-module/
+https://www.folkstalk.com/tech/python-import-file-from-same-directory-with-code-examples/
+https://www.w3schools.com/python/gloss_python_variable_names.asp
+https://datasheets.raspberrypi.com/picow/pico-w-datasheet.pdf
+
+https://docs.micropython.org/en/latest/reference/speed_python.html
+https://docs.micropython.org/en/latest/reference/speed_python.html
+
+-->for memory optimization
+https://youtu.be/jOY1yWrag3U?t=26
+https://favtutor.com/blogs/delete-variable-python#:~:text=Using%20the%20'del'%20command%20is,be%20deleted%20using%20'del'.
+https://stackoverflow.com/questions/25286171/when-does-python-delete-variables#:~:text=Local%20names%20are%20cleaned%20up,like%20anywhere%20else%20in%20Python.
+
+https://lerner.co.il/2019/05/12/python-dicts-and-memory-usage/#:~:text=In%20other%20words%2C%20our%20dictionary,normally%20consume%20that%20much%20memory.
+https://forum.micropython.org/viewtopic.php?t=11037&p=60678
+
+https://forum.micropython.org/viewtopic.php?t=1747
+https://forum.micropython.org/viewtopic.php?t=1747
+
+
+-->for Dual Core Programing
+https://microcontrollerslab.com/dual-core-raspberry-pi-pico-programming-micropython/
+https://www.youtube.com/watch?v=9vvobRfFOwk
+https://mpython.readthedocs.io/en/master/library/micropython/_thread.html
+https://www.electrosoftcloud.com/en/multithreaded-script-on-raspberry-pi-pico-and-micropython/
+
+
+-->Other Stuff
+https://djangostars.com/blog/list-comprehensions-and-generator-expressions/
+https://docs.micropython.org/en/latest/genrst/builtin_types.html
+https://docs.python.org/3/library/pickle.html - > https://stackoverflow.com/questions/19201290/how-to-save-a-dictionary-to-a-file
+
+https://github.com/mcauser/micropython-74hc595
+https://pypi.org/project/PiShiftPy/
+https://pypi.org/project/pi74HC595/
+
+"""
+
+
