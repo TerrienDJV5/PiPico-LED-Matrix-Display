@@ -400,8 +400,8 @@ while True:
     sLock.acquire()
     gc.collect() #clean up Ram
     #print("");print("");print("");print("");print("");print("");
-    print("Entering main Thread")
-    print("FreeMemory: ", gc.mem_free())
+    ##print("Entering main Thread")
+    ##print("FreeMemory: ", gc.mem_free())
     
     ###print("T1 - Memory: ", micropython.mem_info())
     lettersList = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -409,14 +409,16 @@ while True:
     imageName = lettersList[accu0 % len(lettersList)]
     #imageName = nameCacheList[ accu0 % len(nameCacheList) ]
     
+    
     display_Image_Name = imageName
-    print(display_Image_Name)
+    ###print(display_Image_Name)
     
     if (display_Image_Name in registerDisplayImageCache):
         shiftFromBinaryImageStream( registerDisplayImageCache[ display_Image_Name ] ,dataPIN ,clockPIN,latchPIN)
     
     
-    print("Create Random Image")
+    
+    ##print("Create Random Image")
     randomImageArray = [0,0,0,0,0,0,0,0]
     for i in range(8):
         randomImageArray[i] = random.randint(0, 255)
@@ -426,7 +428,7 @@ while True:
     #randomImageArray = mipf.offset_Image( randomImageArray, offsetX = 0, offsetY = -1 )
     #shiftFromBinaryImageStream( mipf.calculateEfficientImageRegisterPatterns( randomImageArray, fastCalculation = True ) ,dataPIN ,clockPIN,latchPIN)
     #print("Optimize")
-    shiftFromBinaryImageStream( mipf.calculateEfficientImageRegisterPatterns( randomImageArray, fastCalculation = False ) ,dataPIN ,clockPIN,latchPIN)
+    #shiftFromBinaryImageStream( mipf.calculateEfficientImageRegisterPatterns( randomImageArray, fastCalculation = False ) ,dataPIN ,clockPIN,latchPIN)
     
     
     
@@ -451,9 +453,9 @@ while True:
         accu1 = 0
     accu1 %= 1024
     
-    print("FreeMemory: ", gc.mem_free())
-    print("Exiting main Thread")
-    print("")
+    ##print("FreeMemory: ", gc.mem_free())
+    ##print("Exiting main Thread")
+    ##print("")
     
     #utime.sleep_ms(1000)
     sLock.release()
